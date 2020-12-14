@@ -296,9 +296,10 @@ public class CvUploadFragment extends Fragment {
                 try {
                     byte[] pdfByteArray = Files.readAllBytes(pdfPath);
                     //bytesd= Base64.encodeToString(pdfByteArray,Base64.DEFAULT);
-                    RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), pdfByteArray);
-                    RequestBody Title = RequestBody.create(MediaType.parse("text/plain"), myFile.getName());
-                    fileToUpload = MultipartBody.Part.createFormData("file", null, requestBody);
+                    RequestBody requestBody1=RequestBody.create(pdfByteArray);
+                  //  RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), pdfByteArray);
+                   // RequestBody Title = RequestBody.create(MediaType.parse("text/plain"), myFile.getName());
+                    fileToUpload = MultipartBody.Part.createFormData("file", myFile.getName(), requestBody1);
                     Log.e("my pdf binary file", pdfByteArray.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
