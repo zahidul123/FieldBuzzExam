@@ -146,55 +146,52 @@ public class CvUploadFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkMandatoryFields()) {
+                    getAllDatas();
 
+                    resumeModelClass = new ResumeModelClass(tsync_id, name, email, phone, full_address,
+                            name_of_university, graduation_year, cgpa,
+                            experience_in_months, current_work_place_name, applying_in,
+                            expected_salary, field_buzz_reference, github_project_url,
+                            cv_file, on_spot_update_time, on_spot_creation_time);
+
+                    finalResumeUploadViewModel.setResumeData(token,resumeModelClass);
+                    finalResumeUploadViewModel.getFinalUploadResponse().observe(getActivity(),resumeResult->{
+                        String result1=resumeResult.toString();
+                        if (!result1.equals("badRequest")){
+                            fileUploadViewModel.setFileuploded(result1, fileToUpload);
+                            fileUploadViewModel.getFileUploadResponse().observe(getActivity(), result -> {
+
+                                String results = result.toString();
+                                if (!results.equals("badRequest")){
+                                    new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE)
+                                            .setTitleText("Success")
+                                            .setContentText("Your Profile creation Successfully")
+                                            .setConfirmText("Ok")
+                                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                                @Override
+                                                public void onClick(SweetAlertDialog sDialog) {
+                                                    sDialog.dismissWithAnimation();
+                                                }
+                                            })
+                                            .show();
+                                }
+                            });
+                        }else {
+                            new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
+                                    .setTitleText("Bad Request")
+                                    .setContentText("Resume Upload Failed Please check Again")
+                                    .setConfirmText("Ok")
+                                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                        @Override
+                                        public void onClick(SweetAlertDialog sDialog) {
+                                            sDialog.dismissWithAnimation();
+                                        }
+                                    })
+                                    .show();
+                        }
+
+                    });
                 }
-                getAllDatas();
-
-                resumeModelClass = new ResumeModelClass(tsync_id, name, email, phone, full_address,
-                        name_of_university, graduation_year, cgpa,
-                        experience_in_months, current_work_place_name, applying_in,
-                        expected_salary, field_buzz_reference, github_project_url,
-                        cv_file, on_spot_update_time, on_spot_creation_time);
-
-                finalResumeUploadViewModel.setResumeData(token,resumeModelClass);
-                finalResumeUploadViewModel.getFinalUploadResponse().observe(getActivity(),resumeResult->{
-                    String result1=resumeResult.toString();
-                    if (!result1.equals("badRequest")){
-                        fileUploadViewModel.setFileuploded(result1, fileToUpload);
-                        fileUploadViewModel.getFileUploadResponse().observe(getActivity(), result -> {
-
-                            String results = result.toString();
-                            if (!results.equals("badRequest")){
-                                new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE)
-                                        .setTitleText("Success")
-                                        .setContentText("Your Profile creation Successfully")
-                                        .setConfirmText("Ok")
-                                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                            @Override
-                                            public void onClick(SweetAlertDialog sDialog) {
-                                                sDialog.dismissWithAnimation();
-                                            }
-                                        })
-                                        .show();
-                            }
-                        });
-                    }else {
-                        new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE)
-                                .setTitleText("Bad Request")
-                                .setContentText("Resume Upload Failed Please check Again")
-                                .setConfirmText("Ok")
-                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sDialog) {
-                                        sDialog.dismissWithAnimation();
-                                    }
-                                })
-                                .show();
-                    }
-
-                });
-
-
 
             }
         });
