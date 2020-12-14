@@ -27,7 +27,7 @@ public class FileUploadRepository {
 
     public LiveData<Object> postUploadeFile(String tokenValue, MultipartBody.Part fileToUpload){
         final MutableLiveData<Object> responseData=new MutableLiveData<>();
-        apiInterface.UploadCvFile(tokenValue,fileToUpload).enqueue(new Callback<Object>() {
+        apiInterface.UploadCvFile(tokenValue,"token "+tokenValue,fileToUpload).enqueue(new Callback<Object>() {
 
 
             @Override
@@ -42,6 +42,7 @@ public class FileUploadRepository {
                         responseData.setValue(((LinkedTreeMap) response.body()).get("token"));
                     }
                 }catch (Exception e){
+                    Log.e("cponvert exception",e.toString());
                     responseData.setValue("badRequest");
                 }
 

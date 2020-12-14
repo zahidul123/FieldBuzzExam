@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -38,12 +39,12 @@ public class MainActivity extends AppCompatActivity {
            @Override
            public void onClick(View v) {
 
-               mainBinding.cardSubmitInterface.setVisibility(View.GONE);
+             /*  mainBinding.cardSubmitInterface.setVisibility(View.GONE);
                CvUploadFragment cvUploadFragment=new CvUploadFragment();
                FragmentManager fragmentManager = getSupportFragmentManager();
-               fragmentManager.beginTransaction().replace(R.id.container, cvUploadFragment).commit();
+               fragmentManager.beginTransaction().replace(R.id.container, cvUploadFragment).commit();*/
 
-               /*if (checkMandatoryField()&&checkEmailPattern()){
+               if (checkMandatoryField()&&checkEmailPattern()){
 
                        InputMethodManager imm = (InputMethodManager)MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
                        imm.hideSoftInputFromWindow(MainActivity.this.getCurrentFocus().getWindowToken(), 0);
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                                }else {
                                    SharedPreference preference=new SharedPreference(getApplicationContext());
                                    preference.putString("token",response);
-
+                                   Log.e("the token is ",response);
                                    mainBinding.cardSubmitInterface.setVisibility(View.GONE);
                                    CvUploadFragment cvUploadFragment=new CvUploadFragment();
                                    FragmentManager fragmentManager = getSupportFragmentManager();
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                            }
                        });
-               }*/
+               }
            }
        });
     }
