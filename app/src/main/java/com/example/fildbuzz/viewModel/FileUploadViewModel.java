@@ -18,9 +18,9 @@ public class FileUploadViewModel extends AndroidViewModel {
         fileUploadRepository=new FileUploadRepository();
 
     }
-    public void setFileuploded(String token, MultipartBody.Part uplodedFile){
+    public void setFileuploded(String token_id,String token, MultipartBody.Part uplodedFile){
         if (fileUploadRepository!=null){
-            fileUploadResponse=fileUploadRepository.postUploadeFile(token,uplodedFile);
+            fileUploadResponse=fileUploadRepository.postUploadeFile(token_id,token,uplodedFile);
         }
     }
     public LiveData<Object>getFileUploadResponse(){

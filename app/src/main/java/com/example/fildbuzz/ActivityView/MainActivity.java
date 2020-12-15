@@ -39,10 +39,6 @@ public class MainActivity extends AppCompatActivity {
            @Override
            public void onClick(View v) {
 
-             /*  mainBinding.cardSubmitInterface.setVisibility(View.GONE);
-               CvUploadFragment cvUploadFragment=new CvUploadFragment();
-               FragmentManager fragmentManager = getSupportFragmentManager();
-               fragmentManager.beginTransaction().replace(R.id.container, cvUploadFragment).commit();*/
 
                if (checkMandatoryField()&&checkEmailPattern()){
 
@@ -92,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             mainBinding.password.setError("Enter Valid Password");
             return false;
         }
-        if (mainBinding.email.getText().toString().length()<10){
+        if (mainBinding.email.getText().toString().length()<11){
             mainBinding.email.setError("Enter Valid Email");
             return false;
         }

@@ -8,10 +8,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
           android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#393A3C"
+        android:background="#F1E9E9"
         tools:context=".ActivityView.MainActivity">
 
         <androidx.cardview.widget.CardView
+           app:cardElevation="30dp"
             android:id="@+id/card_submit_interface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,6 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <com.google.android.material.textfield.TextInputLayout
+                    android:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Email"
@@ -44,6 +46,7 @@
                         />
                 </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.textfield.TextInputLayout
+                    android:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Password"
@@ -58,7 +61,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/password"
-                        android:text="r9JeWuc91"
                         android:inputType="textPassword"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -72,7 +74,7 @@
                     android:layout_marginTop="20dp"
                     android:text="Login"
                     app:elevation="10dp"
-                    android:shadowColor="@color/black"
+
                     />
 
             </LinearLayout>

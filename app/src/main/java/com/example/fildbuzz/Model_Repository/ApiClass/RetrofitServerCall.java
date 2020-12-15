@@ -22,14 +22,13 @@ public class RetrofitServerCall {
         if (retrofit==null){
             synchronized (RetrofitServerCall.class){
                 if (retrofit==null){
+                    OkHttpClient client = new OkHttpClient.Builder()
+                            .retryOnConnectionFailure(true)
+                            .build();
                     retrofit=new Retrofit.Builder()
                             .baseUrl(base_url)
                             .addConverterFactory(GsonConverterFactory.create(gson))
-                            .client(new OkHttpClient().newBuilder()
-                                    .connectTimeout(30, TimeUnit.SECONDS)
-                                    .readTimeout(20, TimeUnit.SECONDS)
-                                    .writeTimeout(20, TimeUnit.SECONDS)
-                                    .build())
+                            .client(client)
                             .build();
                 }
             }

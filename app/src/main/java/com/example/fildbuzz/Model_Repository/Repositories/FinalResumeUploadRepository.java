@@ -11,6 +11,8 @@ import com.example.fildbuzz.Model_Repository.ModelClass.ResumeModelClass;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
+import org.json.JSONObject;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,23 +36,23 @@ public class FinalResumeUploadRepository {
     ) {
         final MutableLiveData<Object> responseData = new MutableLiveData<>();
 
-        apiInterface.SendResumeDetails(/*token, mName, memail, mPhone, mFullAddress,
-                mUniversity, mGraduation, mCgpa, mExperience, mCurrentWork,
-                applying_in, expected_salary, field_buzz_reference,
-                github_project_url, cv_file, on_spot_update_time, on_spot_creation_time*/
-                token,"application/json", resumeModelClass).enqueue(new Callback<Object>() {
+        apiInterface.SendResumeDetails(token,"application/json", resumeModelClass).enqueue(new Callback<Object>() {
 
 
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 try {
-                    Log.e("login response:", response.body().toString());
 
                     Gson gson = new Gson();
                     String json = gson.toJson(response.body());
+                    JSONObject jsonObject=new JSONObject(json);
+                    Log.e("second Api res:", response.body().toString());
+
+                    String newToken_id=jsonObject.getJSONObject("cv_file").getString("id").split("\\.")[0];
+                    Log.e("sdfghj",newToken_id);
                     //we only get token from here
                     if (response.body() != null) {
-                        responseData.setValue(((LinkedTreeMap) response.body()).get("tsync_id"));
+                        responseData.setValue(String.valueOf(newToken_id));
                     }
                 } catch (Exception e) {
                     Log.e("exception ",e.toString());
@@ -62,7 +64,7 @@ public class FinalResumeUploadRepository {
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
                 responseData.setValue("badRequest");
-                Log.e("login exception:", t.toString());
+                Log.e("resume exception:", t.toString());
             }
         });
         return responseData;

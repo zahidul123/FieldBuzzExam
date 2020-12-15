@@ -10,6 +10,8 @@ import com.example.fildbuzz.Model_Repository.ApiClass.RetrofitServerCall;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
+import org.json.JSONObject;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,24 +27,26 @@ public class FileUploadRepository {
 
 //call server for data
 
-    public LiveData<Object> postUploadeFile(String tokenValue, MultipartBody.Part fileToUpload){
+    public LiveData<Object> postUploadeFile(String token_id,String tokenValue, MultipartBody.Part fileToUpload){
         final MutableLiveData<Object> responseData=new MutableLiveData<>();
-        apiInterface.UploadCvFile(tokenValue,"token "+tokenValue,fileToUpload).enqueue(new Callback<Object>() {
+        apiInterface.UploadCvFile(token_id,"close","token "+tokenValue,fileToUpload).enqueue(new Callback<Object>() {
 
 
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 try {
-                    Log.e("login response:",response.body().toString());
 
-                Gson gson = new Gson();
-                String json = gson.toJson(response.body());
-                    //we only get token from here
                     if (response.body()!=null){
-                        responseData.setValue(((LinkedTreeMap) response.body()).get("token"));
+                        Gson gson = new Gson();
+                        String json = gson.toJson(response.body());
+                        Log.e("third api response :",json);
+                        //we only get token from here
+                        JSONObject jsonObject=new JSONObject(json);
+                        String successMessage=jsonObject.getString("message");
+                        responseData.setValue(successMessage);
                     }
                 }catch (Exception e){
-                    Log.e("cponvert exception",e.toString());
+                    Log.e(" exception",e.toString());
                     responseData.setValue("badRequest");
                 }
 

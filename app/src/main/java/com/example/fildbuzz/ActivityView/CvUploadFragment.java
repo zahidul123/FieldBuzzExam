@@ -33,11 +33,17 @@ import com.example.fildbuzz.viewModel.FileUploadViewModel;
 import com.example.fildbuzz.viewModel.FinalResumeUploadViewModel;
 import com.example.fildbuzz.viewModel.LoginViewModel;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.MediaType;
@@ -55,7 +61,7 @@ public class CvUploadFragment extends Fragment {
     private Uri filePath;
     FileUploadViewModel fileUploadViewModel;
     private String firstCreationTime, endOfUrlHit;
-    String bytesd;
+    String base64String;
     private String tsync_id;
     private String name;
     private String email;
@@ -73,7 +79,8 @@ public class CvUploadFragment extends Fragment {
     private CvFile_tsync_id cv_file;
     private String on_spot_update_time;
     private String on_spot_creation_time;
-
+    long kilobytes;
+    byte[] pdfByteArray;
     ResumeModelClass resumeModelClass;
     FinalResumeUploadViewModel finalResumeUploadViewModel;
 
@@ -145,7 +152,9 @@ public class CvUploadFragment extends Fragment {
         mbinding.submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkMandatoryFields()) {
+
+
+                if (checkMandatoryFields()&&checkEmailPattern()) {
                     getAllDatas();
 
                     resumeModelClass = new ResumeModelClass(tsync_id, name, email, phone, full_address,
@@ -158,14 +167,13 @@ public class CvUploadFragment extends Fragment {
                     finalResumeUploadViewModel.getFinalUploadResponse().observe(getActivity(),resumeResult->{
                         String result1=resumeResult.toString();
                         if (!result1.equals("badRequest")){
-                            fileUploadViewModel.setFileuploded(result1, fileToUpload);
+                            fileUploadViewModel.setFileuploded(result1,token, fileToUpload);
                             fileUploadViewModel.getFileUploadResponse().observe(getActivity(), result -> {
-
                                 String results = result.toString();
                                 if (!results.equals("badRequest")){
                                     new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE)
                                             .setTitleText("Success")
-                                            .setContentText("Your Profile creation Successfully")
+                                            .setContentText(results)
                                             .setConfirmText("Ok")
                                             .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                                 @Override
@@ -211,6 +219,9 @@ public class CvUploadFragment extends Fragment {
         applying_in = mbinding.inputDeveloperType.getText().toString();
         expected_salary = mbinding.inputSalary.getText().toString();
         field_buzz_reference = mbinding.inputReference.getText().toString();
+        if (field_buzz_reference.length()<1){
+            field_buzz_reference="N/A";
+        }
         github_project_url = mbinding.inputGithub.getText().toString();
         on_spot_update_time = System.currentTimeMillis() + "";
 
@@ -223,7 +234,7 @@ public class CvUploadFragment extends Fragment {
             status = false;
         }
 
-        if (mbinding.inputEmail.getText().toString().length() < 1) {
+        if (mbinding.inputEmail.getText().toString().length() < 11) {
             mbinding.inputEmail.setError("Enter Valid Email");
             status = false;
         }
@@ -261,9 +272,21 @@ public class CvUploadFragment extends Fragment {
             mbinding.showFileName.setError("Enter Your Resume");
             status = false;
         }
+        if (kilobytes>4096){
+            mbinding.showFileName.setError("FDF size less than 4 Mb");
+            status = false;
+        }
         return status;
     }
-
+    private boolean checkEmailPattern() {
+        String emailPtrn=mbinding.inputEmail.getText().toString();
+        Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailPtrn);
+        if (matcher.find()==false){
+            mbinding.inputEmail.setError("Enter Valid Email");
+        }
+        return !matcher.find();
+    }
 
     private void fileOpenButton() {
         mbinding.fileOpen.setOnClickListener(new View.OnClickListener() {
@@ -290,17 +313,40 @@ public class CvUploadFragment extends Fragment {
             Log.e("file path", path);
             File myFile = new File(path);
             // Read file to byte array
+            long bytes = myFile.length();
 
+             kilobytes = (bytes / 1024);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 Path pdfPath = Paths.get(path);
                 try {
-                    byte[] pdfByteArray = Files.readAllBytes(pdfPath);
-                    //bytesd= Base64.encodeToString(pdfByteArray,Base64.DEFAULT);
+                    FileInputStream fis = new FileInputStream(myFile);
+                    //System.out.println(file.exists() + "!!");
+                    //InputStream in = resource.openStream();
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    byte[] buf = new byte[1024];
+                    try {
+                        for (int readNum; (readNum = fis.read(buf)) != -1;) {
+                            bos.write(buf, 0, readNum); //no doubt here is 0
+                            //Writes len bytes from the specified byte array starting at offset off to this byte array output stream.
+                            System.out.println("read " + readNum + " bytes,");
+                        }
+                    } catch (IOException ex) {
+                       Log.e(" stream exception",ex.toString());
+                    }
+                    byte[] byteasd = bos.toByteArray();
+
+                     pdfByteArray = Files.readAllBytes(pdfPath);
+                    base64String= Base64.encodeToString(pdfByteArray,Base64.DEFAULT);
                     RequestBody requestBody1=RequestBody.create(pdfByteArray);
-                  //  RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), pdfByteArray);
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), myFile);
                    // RequestBody Title = RequestBody.create(MediaType.parse("text/plain"), myFile.getName());
+                    // create RequestBody instance from file
+                    RequestBody requestFile = RequestBody.create(
+                                    MediaType.parse(getActivity().getContentResolver().getType(filePath)),
+                                    myFile
+                            );
                     fileToUpload = MultipartBody.Part.createFormData("file", myFile.getName(), requestBody1);
-                    Log.e("my pdf binary file", pdfByteArray.toString());
+                    Log.e("my pdf binary file", pdfByteArray.length+"");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
